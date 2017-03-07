@@ -1,0 +1,34 @@
+- name: Verify if MYSQL DB file exists
+  local_action: stat path="{{ inventory_dir }}/host_files/{{ inventory_hostname }}/{{ item.name }}.sql"
+  register: p
+  sudo: no
+  with_items: "{{ mysql_databases }}"
+
+- name: Copy MYSQL database dump file
+  copy:
+    src: "{{ item.name }}.sql"
+    dest: /tmp
+    force: yes
+  #when: mysql_databases is defined and p.stat.exists
+  with_items: "{{ mysql_databases }}"
+  
+- name: Delete existing database
+  mysql_db:
+    name: "{{ item.name }}"
+    state: absent
+  when: mysql_databases is defined
+  with_items: "{{ mysql_databases }}"
+
+- name: Create database
+  mysql_db:
+    name: "{{ item.name }}"
+    state: present
+  with_items: "{{ mysql_databases }}"
+
+- name: Restore MYSQL database
+  mysql_db:
+    name: "{{ item.name }}"
+    state: import
+    target: "/tmp/{{ item.name }}.sql"
+  when: mysql_databases is defined
+  with_items: "{{ mysql_databases }}"

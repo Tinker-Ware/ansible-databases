@@ -1,0 +1,13 @@
+## Database file should be located under provisioning/host_files/{{ hostname}}/
+
+##Example
+
+#SQL FILE:
+  # provisioning/host_files/my_host/my_database.sql
+
+#INSIDE VARIALBES FILE
+
+# mysql_databases:
+#   - name: "my_database"
+#     encoding: utf8
+#     collation: utf8_general_ci
